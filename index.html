@@ -217,10 +217,17 @@
                 
                 <div class="input-group">
                     <label for="prompt">AI Prompt Template</label>
-                    <textarea id="prompt" placeholder="Enter your custom prompt for generating slugs...">Based on this Amazon product name and description, generate 5 SEO-friendly category slugs that would be suitable for an e-commerce website. Focus on broad categories this product would fit into. Return only the slugs, separated by commas, using lowercase letters and hyphens only.
+                    <textarea id="prompt" placeholder="Enter your custom prompt for generating slugs...">Based on product title and description, return 5 concise category slugs (one per line). These slugs should reflect what users would search for and fit the format of "10 Best {slug} – 2025". Return only clean slug names, no numbers, no full titles.
 
 Product: {product_name}
-Description: {product_description}</textarea>
+Description: {product_description}
+
+Example format:
+hair-clippers
+barber-tools
+grooming-kits
+cordless-trimmers
+mens-accessories</textarea>
                 </div>
                 
                 <button class="generate-btn" onclick="generateSlugs()">
