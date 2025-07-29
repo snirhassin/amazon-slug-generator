@@ -222,11 +222,11 @@
 Product: {product_name}
 
 Example format:
-hair-clippers
-barber-tools
-grooming-kits
-cordless-trimmers
-mens-accessories</textarea>
+professional-hair-clippers
+fade-cutting-tools
+wireless-beard-trimmers
+salon-grade-clippers
+precision-grooming-devices</textarea>
                 </div>
                 
                 <button class="generate-btn" onclick="generateSlugs()">
@@ -434,20 +434,59 @@ mens-accessories</textarea>
             console.log('Filled prompt for AI:', filledPrompt);
             
             try {
-                // Try OpenAI API via our secure endpoint
-                const openaiResponse = await fetch('/api/generate-slugs', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        prompt: filledPrompt
-                    })
-                });
+                let aiResponse;
+                
+                // Check if we're running locally (config.js loaded) or deployed
+                if (window.OPENAI_API_KEY && window.OPENAI_API_KEY !== 'YOUR_OPENAI_API_KEY_HERE') {
+                    // Local development - use direct OpenAI API call
+                    console.log('Using local OpenAI API call');
+                    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + window.OPENAI_API_KEY
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-3.5-turbo',
+                            messages: [
+                                {
+                                    role: 'user',
+                                    content: filledPrompt
+                                }
+                            ],
+                            max_tokens: 100,
+                            temperature: 0.7
+                        })
+                    });
 
-                if (openaiResponse.ok) {
-                    const data = await openaiResponse.json();
-                    const aiResponse = data.response;
+                    if (openaiResponse.ok) {
+                        const data = await openaiResponse.json();
+                        aiResponse = data.choices[0].message.content.trim();
+                    } else {
+                        throw new Error('Local OpenAI API failed');
+                    }
+                } else {
+                    // Deployed version - use secure endpoint
+                    console.log('Using deployed API endpoint');
+                    const endpointResponse = await fetch('/api/generate-slugs', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            prompt: filledPrompt
+                        })
+                    });
+
+                    if (endpointResponse.ok) {
+                        const data = await endpointResponse.json();
+                        aiResponse = data.response;
+                    } else {
+                        throw new Error('Deployed API endpoint failed');
+                    }
+                }
+
+                if (aiResponse) {
                     console.log('OpenAI response:', aiResponse);
                     
                     // Parse the AI response - handle multiple formats
