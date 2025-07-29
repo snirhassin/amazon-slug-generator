@@ -217,10 +217,9 @@
                 
                 <div class="input-group">
                     <label for="prompt">AI Prompt Template</label>
-                    <textarea id="prompt" placeholder="Enter your custom prompt for generating slugs...">Based on product title and description, return 5 concise category slugs (one per line) this product can be highlighted on as the #1 product of a top 10 list. Focus on narrow, niche product categories and specific use cases or variants of the product. the format of "10 Best {slug} – 2025". Return only clean slug names, no numbers, no full titles. Avoid general categories like mens-accessories, women-shoes, or memory-support.
+                    <textarea id="prompt" placeholder="Enter your custom prompt for generating slugs...">Based on product title only, return 5 concise category slugs (one per line) this product can be highlighted on as the #1 product of a top 10 list. Focus on narrow, niche product categories and specific use cases or variants of the product. the format of "10 Best {slug} – 2025". Return only clean slug names, no numbers, no full titles. Avoid general categories like mens-accessories, women-shoes, or memory-support.
 
 Product: {product_name}
-Description: {product_description}
 
 Example format:
 hair-clippers
