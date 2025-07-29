@@ -434,29 +434,20 @@ mens-accessories</textarea>
             console.log('Filled prompt for AI:', filledPrompt);
             
             try {
-                // Try OpenAI API first
-                const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Try OpenAI API via our secure endpoint
+                const openaiResponse = await fetch('/api/generate-slugs', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + (window.OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY')
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'gpt-3.5-turbo',
-                        messages: [
-                            {
-                                role: 'user',
-                                content: filledPrompt
-                            }
-                        ],
-                        max_tokens: 100,
-                        temperature: 0.7
+                        prompt: filledPrompt
                     })
                 });
 
                 if (openaiResponse.ok) {
                     const data = await openaiResponse.json();
-                    const aiResponse = data.choices[0].message.content.trim();
+                    const aiResponse = data.response;
                     console.log('OpenAI response:', aiResponse);
                     
                     // Parse the AI response - handle multiple formats
