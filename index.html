@@ -252,7 +252,21 @@ mens-accessories</textarea>
         </div>
     </div>
 
+    <!-- Load config if available -->
+    <script src="config.js" onerror="console.log('Config file not found - using defaults')"></script>
+    
     <script>
+        // Test if JavaScript is working
+        console.log('JavaScript loaded successfully');
+        
+        // OpenAI API key - set via config.js or environment
+        window.OPENAI_API_KEY = window.OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY_HERE';
+        
+        // Debug API availability
+        console.log('Checking API configuration...');
+        console.log('RapidAPI configured:', 'dc9404ca72mshf17df4e79b9ae01p167dc2jsnea3edd65fd3e' ? 'Yes' : 'No');
+        console.log('OpenAI configured:', window.OPENAI_API_KEY !== 'YOUR_OPENAI_API_KEY_HERE' ? 'Yes' : 'No');
+        
         async function generateSlugs() {
             const asin = document.getElementById('asin').value.trim();
             const domain = document.getElementById('domain').value.trim();
