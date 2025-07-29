@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Slug Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .product-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-info p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .slugs-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .slug-item {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .slug-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .slug-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .slug-link:hover {
+            color: #764ba2;
+        }
+
+        .slug-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .domain-input {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Amazon Slug Generator</h1>
+            <p>Generate SEO-friendly category slugs from Amazon product ASINs</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group domain-input">
+                    <label for="domain">Your Domain</label>
+                    <input type="text" id="domain" placeholder="example.com" value="yoursite.com">
+                </div>
+                
+                <div class="input-group">
+                    <label for="asin">Amazon ASIN</label>
+                    <input type="text" id="asin" placeholder="B08N5WRWNW" maxlength="10">
+                </div>
+                
+                <div class="input-group">
+                    <label for="prompt">AI Prompt Template</label>
+                    <textarea id="prompt" placeholder="Enter your custom prompt for generating slugs...">Based on this Amazon product name and description, generate 5 SEO-friendly category slugs that would be suitable for an e-commerce website. Focus on broad categories this product would fit into. Return only the slugs, separated by commas, using lowercase letters and hyphens only.
+
+Product: {product_name}
+Description: {product_description}</textarea>
+                </div>
+                
+                <button class="generate-btn" onclick="generateSlugs()">
+                    Generate Slugs
+                </button>
+            </div>
+            
+            <div class="results-section" id="results">
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Fetching product data and generating slugs...</p>
+                </div>
+                
+                <div class="product-info" id="productInfo" style="display: none;">
+                    <h3>Product Information</h3>
+                    <p id="productDetails"></p>
+                </div>
+                
+                <div class="slugs-container" id="slugsContainer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateSlugs() {
+            const asin = document.getElementById('asin').value.trim();
+            const domain = document.getElementById('domain').value.trim();
+            const prompt = document.getElementById('prompt').value.trim();
+            
+            if (!asin || !domain || !prompt) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (asin.length !== 10) {
+                alert('ASIN should be exactly 10 characters');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('productInfo').style.display = 'none';
+            document.getElementById('slugsContainer').innerHTML = '';
+            
+            try {
+                // Simulate API calls for now - we'll replace with real APIs later
+                await simulateProductFetch(asin, domain, prompt);
+            } catch (error) {
+                alert('Error generating slugs: ' + error.message);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        async function simulateProductFetch(asin, domain, prompt) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Mock product data based on ASIN
+            const mockProducts = {
+                'B08N5WRWNW': {
+                    name: 'Apple iPhone 12 Pro Clear Case with MagSafe',
+                    description: 'Perfectly aligned magnets make wireless charging faster and easier than ever before. And when it\'s time to charge, just leave the case on.'
+                },
+                'B07FZ8S74R': {
+                    name: 'Echo Dot (3rd Gen) - Smart speaker with Alexa',
+                    description: 'Our most popular smart speaker with a fabric design. It is our most compact smart speaker that fits perfectly into small spaces.'
+                }
+            };
+            
+            const product = mockProducts[asin] || {
+                name: 'Sample Product Name',
+                description: 'This is a sample product description for demonstration purposes.'
+            };
+            
+            // Generate mock slugs
+            const slugs = generateMockSlugs(product.name, product.description);
+            
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+            
+            // Show product info
+            document.getElementById('productInfo').style.display = 'block';
+            document.getElementById('productDetails').innerHTML = `
+                <strong>${product.name}</strong><br>
+                <span style="color: #666;">${product.description}</span>
+            `;
+            
+            // Display slugs
+            displaySlugs(slugs, domain);
+        }
+        
+        function generateMockSlugs(productName, description) {
+            // Simple mock slug generation based on product name
+            const words = productName.toLowerCase().split(' ');
+            const slugs = [];
+            
+            // Generate different category combinations
+            if (words.includes('iphone') || words.includes('phone')) {
+                slugs.push('phone-accessories', 'mobile-cases', 'smartphone-gear', 'iphone-cases', 'tech-accessories');
+            } else if (words.includes('echo') || words.includes('alexa')) {
+                slugs.push('smart-speakers', 'home-automation', 'voice-assistants', 'amazon-devices', 'smart-home');
+            } else {
+                slugs.push('electronics', 'accessories', 'gadgets', 'tech-products', 'consumer-electronics');
+            }
+            
+            return slugs.slice(0, 5);
+        }
+        
+        function displaySlugs(slugs, domain) {
+            const container = document.getElementById('slugsContainer');
+            container.innerHTML = '';
+            
+            slugs.forEach((slug, index) => {
+                const slugItem = document.createElement('div');
+                slugItem.className = 'slug-item';
+                slugItem.style.animationDelay = `${index * 0.1}s`;
+                
+                const fullUrl = `https://${domain}/${slug}`;
+                
+                slugItem.innerHTML = `
+                    <a href="${fullUrl}" target="_blank" class="slug-link">${fullUrl}</a>
+                    <div class="slug-description">Category: ${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                `;
+                
+                container.appendChild(slugItem);
+            });
+        }
+        
+        // Allow Enter key to trigger generation
+        document.getElementById('asin').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateSlugs();
+            }
+        });
+    </script>
+</body>
+</html>
